@@ -1,0 +1,155 @@
+---
+# common dependencies
+- name: install basic packages
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update-cache: yes
+  with_items:
+    - python-software-properties
+    - python
+    - g++
+    - make
+    - vim
+    - htop
+    - git-core
+
+- name: install ansible dependencies
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update-cache: yes
+  with_items:
+    - libpq-dev
+    - python-psycopg2
+
+# database
+- name: install postgres packages
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update-cache: yes
+  with_items:
+    - postgresql
+    - postgresql-contrib
+
+- name: setup database
+  sudo_user: postgres
+  postgresql_db:
+    db: "{{ sentry_db }}"
+    encoding: 'UTF-8'
+    lc_collate: 'en_US.UTF-8'
+    lc_ctype: 'en_US.UTF-8'
+    template: 'template0'
+
+- name: grant access for database to user
+  sudo_user: postgres
+  postgresql_user:
+    db: "{{ sentry_db }}"
+    user: "{{ sentry_db_user }}"
+    password: "{{ sentry_db_password }}"
+    role_attr_flags: "CREATEDB,SUPERUSER"
+
+# user
+- name: add sentry user
+  user:
+    name: "{{ sentry_user }}"
+    state: "present"
+    home: "/home/{{ sentry_user }}"
+    shell: "/bin/bash"
+
+- name: chown sentry sentry_user directory
+  file:
+    path: "/home/{{ sentry_user }}"
+    owner: "{{ sentry_user }}"
+    state: "directory"
+
+- name: copy authorized_keys for sentry user
+  authorized_key:
+    user: "{{ sentry_user }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    path: "/home/{{ sentry_user }}/.ssh/authorized_keys"
+    state: "present"
+    manage_dir: "no"
+
+- name: change ownership of ssh directory
+  file:
+    path: "/home/{{ sentry_user }}/.ssh"
+    owner: "{{ sentry_user }}"
+    group: "{{ sentry_user }}"
+
+# sentry
+- name: install sentry dependencies
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update-cache: yes
+  with_items:
+    - python-setuptools
+    - python-dev
+    - python-pip
+
+- name: create sentry directory
+  file:
+    path: "/home/{{ sentry_user }}/.sentry"
+    owner: "{{ sentry_user }}"
+    group: "{{ sentry_user }}"
+    mode: 0760
+    state: directory
+    recurse: yes
+
+- name: copy config files
+  template:
+    src: "sentry.conf.py.j2"
+    dest: "/home/{{ sentry_user }}/.sentry/sentry.conf.py"
+    owner: "{{ sentry_user }}"
+    group: "{{ sentry_user }}"
+    mode: 0600
+
+- name: install virtualenv
+  pip:
+    name: virtualenv
+
+- name: install pexpect
+  pip:
+    name: pexpect
+    virtualenv: "/home/{{ sentry_user }}/env"
+
+- name: install sentry
+  pip:
+    name: "{{ item }}"
+    virtualenv: "/home/{{ sentry_user }}/env"
+  with_items:
+    - "sentry[postgres]"
+    - "git+https://github.com/dwaiter/django-bcrypt#egg=django-bcrypt"
+
+- name: install sentry plugins
+  pip:
+    name: "{{ item }}"
+    virtualenv: "/home/{{ sentry_user }}/env"
+  with_items: sentry_plugins
+
+- name: correct folder permissions
+  file:
+    path: "/home/{{ sentry_user }}/env"
+    owner: "{{ sentry_user }}"
+    group: "{{ sentry_user }}"
+    recurse: yes
+
+- name: migrate database
+  shell: "su {{ sentry_user }} -c 'source /home/{{ sentry_user }}/env/bin/activate && sentry --config=/home/{{ sentry_user }}/.sentry/sentry.conf.py upgrade'"
+
+- name: copy superuser creation template
+  template:
+    src: "createsuperuser.py.j2"
+    dest: "/home/{{ sentry_user }}/temp.py"
+    owner: "{{ sentry_user }}"
+    group: "{{ sentry_user }}"
+
+- name: create sentry super user
+  shell: "su {{ sentry_user }} -c 'source /home/{{ sentry_user }}/env/bin/activate && python /home/{{ sentry_user }}/temp.py'"
+
+- name: remove superuser creation template
+  file:
+    path: "/home/{{ sentry_user }}/temp.py"
+    state: absent

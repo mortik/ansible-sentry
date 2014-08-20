@@ -1,0 +1,26 @@
+{
+  "name": "ansible-sentry",
+  "version": "0.0.1",
+  "authors": [
+    "Marten Klitzke <m.klitzke@gmail.com>"
+  ],
+  "description": "Install Sentry Bugtracker",
+  "main": "tasks/main.yml",
+  "keywords": [
+    "ansible",
+    "sentry"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "host_vars",
+    "Vagrantfile",
+    "vagrant",
+    "role.yml",
+    "ansible.cfg"
+  ]
+}
