@@ -1,2 +1,3 @@
 ---
 root_user: vagrant
+sentry_domain: 10.0.0.14

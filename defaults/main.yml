@@ -2,12 +2,14 @@ sentry_user: sentry
 sentry_domain: sentry.dev
 sentry_protocol: http
 sentry_port: 9000
+sentry_with_supervisor: True
+sentry_with_db: True
 sentry_db:
   name: sentry
   user: sentry
   password:
-  host:
-  port:
+  host: ""
+  port: ""
 sentry_secret:
 sentry_mail:
   default_from:
@@ -17,8 +19,8 @@ sentry_smtp:
   user:
   port:
 sentry_superuser:
-  name: "max"
-  email: "max@mustermann.de"
+  username: "admin"
+  email: "admin@fake.com"
   password: "nopass"
 sentry_github:
   id:

@@ -1,0 +1,13 @@
+[program:sentry-app]
+directory=/home/{{ sentry_user }}/
+command=/home/{{ sentry_user }}/env/bin/sentry --config=/home/{{ sentry_user }}/.sentry/sentry.conf.py start http
+autostart=true
+autorestart=true
+redirect_stderr=true
+stopsignal=QUIT
+stdout_logfile=/home/{{ sentry_user }}/app.log
+stderr_logfile=/home/{{ sentry_user }}/app.error.log
+user={{ sentry_user }}
+
+[group:sentry]
+programs=sentry-app

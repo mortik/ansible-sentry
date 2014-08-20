@@ -8,7 +8,7 @@ import pexpect
 import re
 import sys
 
-child = pexpect.spawn('/usr/bin/env', ['sentry', '--config=/home/{{ sentry_user }}/.sentry/sentry.conf.py', 'createsuperuser', '--username={{ sentry_superuser.name }}', '--email={{ sentry_superuser.email }}'])
+child = pexpect.spawn('/usr/bin/env', ['sentry', '--config=/home/{{ sentry_user }}/.sentry/sentry.conf.py', 'createsuperuser', '--username={{ sentry_superuser.username }}', '--email={{ sentry_superuser.email }}'])
 if (child.isalive()):
   child.logfile = sys.stdout
   child.expect('Password:.*')

@@ -1,54 +1,13 @@
 ---
-# common dependencies
-- name: install basic packages
+- name: install dependencies
   apt:
     pkg: "{{ item }}"
     state: installed
     update-cache: yes
   with_items:
-    - python-software-properties
-    - python
-    - g++
-    - make
-    - vim
-    - htop
-    - git-core
-
-- name: install ansible dependencies
-  apt:
-    pkg: "{{ item }}"
-    state: installed
-    update-cache: yes
-  with_items:
-    - libpq-dev
     - python-psycopg2
-
-# database
-- name: install postgres packages
-  apt:
-    pkg: "{{ item }}"
-    state: installed
-    update-cache: yes
-  with_items:
-    - postgresql
-    - postgresql-contrib
-
-- name: setup database
-  sudo_user: postgres
-  postgresql_db:
-    db: "{{ sentry_db }}"
-    encoding: 'UTF-8'
-    lc_collate: 'en_US.UTF-8'
-    lc_ctype: 'en_US.UTF-8'
-    template: 'template0'
-
-- name: grant access for database to user
-  sudo_user: postgres
-  postgresql_user:
-    db: "{{ sentry_db }}"
-    user: "{{ sentry_db_user }}"
-    password: "{{ sentry_db_password }}"
-    role_attr_flags: "CREATEDB,SUPERUSER"
+    - libpq-dev
+    - git-core
 
 # user
 - name: add sentry user
@@ -78,6 +37,42 @@
     owner: "{{ sentry_user }}"
     group: "{{ sentry_user }}"
 
+# database
+- name: install postgres packages
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update-cache: yes
+  with_items:
+    - postgresql
+    - postgresql-contrib
+
+- service:
+    name: postgresql
+    state: started
+  when: sentry_with_db
+
+- name: setup database
+  sudo_user: postgres
+  postgresql_db:
+    db: "{{ sentry_db.name }}"
+    encoding: 'UTF-8'
+    lc_collate: 'en_US.UTF-8'
+    lc_ctype: 'en_US.UTF-8'
+    template: 'template0'
+    state: present
+  when: sentry_with_db
+
+- name: grant access for database to user
+  sudo_user: postgres
+  postgresql_user:
+    db: "{{ sentry_db.name }}"
+    user: "{{ sentry_db.user }}"
+    password: "{{ sentry_db.password }}"
+    role_attr_flags: "CREATEDB,SUPERUSER"
+    state: present
+  when: sentry_with_db
+
 # sentry
 - name: install sentry dependencies
   apt:
@@ -105,6 +100,8 @@
     owner: "{{ sentry_user }}"
     group: "{{ sentry_user }}"
     mode: 0600
+  notify:
+    - restart sentry
 
 - name: install virtualenv
   pip:
@@ -153,3 +150,33 @@
   file:
     path: "/home/{{ sentry_user }}/temp.py"
     state: absent
+
+# supervisor
+- name: install supervisor
+  apt:
+    pkg: supervisor
+    state: installed
+    update-cache: yes
+  when: sentry_with_supervisor
+
+- name: supervisor conf
+  template:
+    src: supervisor.conf.j2
+    dest: "/etc/supervisor/conf.d/sentry.conf"
+    owner: root
+    group: root
+    mode: 0600
+  when: sentry_with_supervisor
+
+- name: update supervisorctl
+  shell: supervisorctl update
+  when: sentry_with_supervisor
+
+- name: allow user to use supervisorctl
+  template:
+    src: sudoers.j2
+    dest: "/etc/sudoers.d/sentry"
+    owner: root
+    group: root
+    mode: 0440
+  when: sentry_with_supervisor
