@@ -1,2 +1,5 @@
 ---
 root_user: root
+sentry_with_postgres: True
+sentry_with_nginx: True
+
