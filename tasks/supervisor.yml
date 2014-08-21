@@ -1,0 +1,25 @@
+---
+- name: install supervisor
+  apt:
+    pkg: supervisor
+    state: installed
+    update-cache: yes
+
+- name: supervisor conf
+  template:
+    src: supervisor.conf.j2
+    dest: "/etc/supervisor/conf.d/sentry.conf"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: update supervisorctl
+  shell: supervisorctl update
+
+- name: allow user to use supervisorctl
+  template:
+    src: sudoers.j2
+    dest: "/etc/sudoers.d/sentry"
+    owner: root
+    group: root
+    mode: 0440

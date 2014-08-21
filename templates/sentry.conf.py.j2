@@ -8,11 +8,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': '{{ sentry_db.name }}',
-        'USER': '{{ sentry_db.user }}',
-        'PASSWORD': '{{ sentry_db.password }}',
-        'HOST': '{{ sentry_db.host }}',
-        'PORT': '{{ sentry_db.port }}',
+        'NAME': '{{ sentry_db }}',
+        'USER': '{{ sentry_db_user }}',
+        'PASSWORD': '{{ sentry_db_password }}',
+        'HOST': '{{ sentry_db_host }}',
+        'PORT': '{{ sentry_db_port }}',
 
         'OPTIONS': {
             'autocommit': True,
@@ -101,14 +101,14 @@ SENTRY_WEB_OPTIONS = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = '{{ sentry_smtp.host }}'
-EMAIL_HOST_PASSWORD = '{{ sentry_smtp.password }}'
-EMAIL_HOST_USER = '{{ sentry_smtp.user }}'
-EMAIL_PORT = {{ sentry_smtp.port }}
-EMAIL_USE_TLS = True
+EMAIL_HOST = '{{ sentry_smtp_host }}'
+EMAIL_HOST_PASSWORD = '{{ sentry_smtp_password }}'
+EMAIL_HOST_USER = '{{ sentry_smtp_user }}'
+EMAIL_PORT = {{ sentry_smtp_port }}
+EMAIL_USE_TLS = {{ sentry_smtp_tls }}
 
 # The email address to send on behalf of
-SERVER_EMAIL = '{{ sentry_mail.default_from }}'
+SERVER_EMAIL = '{{ sentry_mail_default_from }}'
 
 ###########
 ## etc. ##
@@ -118,8 +118,8 @@ SERVER_EMAIL = '{{ sentry_mail.default_from }}'
 # Changing this value will result in all current sessions being invalidated
 SECRET_KEY = '{{ sentry_secret }}'
 
-SENTRY_ALLOW_REGISTRATION = False
-SOCIAL_AUTH_CREATE_USERS = False
+SENTRY_ALLOW_REGISTRATION = {{ sentry_registration }}
+SOCIAL_AUTH_CREATE_USERS = {{ sentry_social_auth_create_users }}
 
 # http://twitter.com/apps/new
 # It's important that input a callback URL, even if its useless. We have no idea why, consult Twitter.

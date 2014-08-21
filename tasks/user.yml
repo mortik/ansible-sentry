@@ -1,0 +1,27 @@
+---
+- name: add sentry user
+  user:
+    name: "{{ sentry_user }}"
+    state: "present"
+    home: "{{ sentry_home }}"
+    shell: "/bin/bash"
+
+- name: chown sentry sentry_user directory
+  file:
+    path: "{{ sentry_home }}"
+    owner: "{{ sentry_user }}"
+    state: "directory"
+
+- name: copy authorized_keys for sentry user
+  authorized_key:
+    user: "{{ sentry_user }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    path: "{{ sentry_home }}/.ssh/authorized_keys"
+    state: "present"
+    manage_dir: "no"
+
+- name: change ownership of ssh directory
+  file:
+    path: "{{ sentry_home }}/.ssh"
+    owner: "{{ sentry_user }}"
+    group: "{{ sentry_user }}"

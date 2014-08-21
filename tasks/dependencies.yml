@@ -1,0 +1,10 @@
+---
+- name: install dependencies
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update-cache: yes
+  with_items:
+    - python-psycopg2
+    - libpq-dev
+    - git-core

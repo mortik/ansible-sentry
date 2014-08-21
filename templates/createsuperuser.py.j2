@@ -8,13 +8,13 @@ import pexpect
 import re
 import sys
 
-child = pexpect.spawn('/usr/bin/env', ['sentry', '--config=/home/{{ sentry_user }}/.sentry/sentry.conf.py', 'createsuperuser', '--username={{ sentry_superuser.username }}', '--email={{ sentry_superuser.email }}'])
+child = pexpect.spawn('/usr/bin/env', ['sentry', '--config={{ sentry_home }}/.sentry/sentry.conf.py', 'createsuperuser', '--username={{ sentry_superuser_username }}', '--email={{ sentry_superuser_email }}'])
 if (child.isalive()):
   child.logfile = sys.stdout
   child.expect('Password:.*')
-  child.send('{{ sentry_superuser.password }}\r')
+  child.send('{{ sentry_superuser_password }}\r')
   child.expect('Password .*')
-  child.sendline('{{ sentry_superuser.password }}\r')
+  child.sendline('{{ sentry_superuser_password }}\r')
   child.kill(1)
 else:
   print('error calling sentry')

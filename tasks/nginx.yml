@@ -1,0 +1,34 @@
+---
+- apt_repository:
+    repo: 'ppa:nginx/stable'
+    state: present
+    update_cache: yes
+
+- apt:
+    pkg: "nginx"
+    state: present
+
+- name: copy site configuration
+  template:
+    src: vhost.j2
+    dest: "/etc/nginx/sites-available/sentry"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - restart sentry nginx
+
+- name: symlink site configuration
+  file:
+    src: "/etc/nginx/sites-available/sentry"
+    dest: "/etc/nginx/sites-enabled/sentry"
+    owner: root
+    group: root
+    mode: 0644
+    state: link
+  notify:
+    - restart sentry nginx
+
+- service:
+    name: nginx
+    state: started

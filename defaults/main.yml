@@ -1,27 +1,26 @@
 sentry_user: sentry
+sentry_home: "/home/{{ sentry_user }}"
 sentry_domain: sentry.dev
+sentry_registration: False
+sentry_social_auth_create_users: False
 sentry_protocol: http
 sentry_port: 9000
-sentry_with_supervisor: True
-sentry_with_db: True
-sentry_db:
-  name: sentry
-  user: sentry
-  password:
-  host: ""
-  port: ""
+sentry_db: sentry
+sentry_db_user: sentry
+sentry_db_password:
+sentry_db_host: ""
+sentry_db_port: ""
 sentry_secret:
-sentry_mail:
-  default_from:
-sentry_smtp:
-  host:
-  password:
-  user:
-  port:
+sentry_mail_default_from:
+sentry_smtp_host:
+sentry_smtp_password:
+sentry_smtp_user:
+sentry_smtp_port:
+sentry_smtp_tls: True
 sentry_superuser:
-  username: "admin"
-  email: "admin@fake.com"
-  password: "nopass"
+sentry_superuser_username: "admin"
+sentry_superuser_email: "admin@fake.com"
+sentry_superuser_password: "nopass"
 sentry_github:
   id:
   secret:
@@ -45,3 +44,6 @@ sentry_plugins:
   - "sentry-pivotal"
   - "sentry-slack"
   - "sentry-trello"
+sentry_with_supervisor: True
+sentry_with_nginx: False
+sentry_with_postgres: False
