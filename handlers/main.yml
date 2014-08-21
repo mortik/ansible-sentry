@@ -1,6 +1,6 @@
 ---
 - name: restart sentry
-  shell: "sudo supervisorctl restart sentry-app"
+  shell: "sudo supervisorctl restart sentry:*"
 
 - name: restart sentry nginx
   service:
