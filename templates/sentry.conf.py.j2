@@ -92,6 +92,10 @@ SENTRY_WEB_OPTIONS = {
     'secure_scheme_headers': {'X-FORWARDED-PROTO': 'https'},
 }
 
+{% if sentry_allowed_hosts %}
+ALLOWED_HOSTS = [{% for item in sentry_allowed_hosts %}'{{item}}'{% if not loop.last %},{% endif %}{% endfor %}]
+{% endif %}
+
 #################
 ## Mail Server ##
 #################

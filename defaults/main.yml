@@ -1,6 +1,7 @@
 sentry_user: sentry
 sentry_home: "/home/{{ sentry_user }}"
 sentry_domain: sentry.dev
+sentry_allowed_hosts: []
 sentry_registration: False
 sentry_social_auth_create_users: False
 sentry_protocol: http

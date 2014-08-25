@@ -2,3 +2,5 @@
 root_user: vagrant
 sentry_with_postgres: True
 sentry_with_nginx: True
+sentry_allowed_hosts:
+  - '10.0.0.14'
