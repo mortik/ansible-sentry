@@ -93,7 +93,7 @@ SENTRY_WEB_OPTIONS = {
 }
 
 {% if sentry_allowed_hosts %}
-ALLOWED_HOSTS = [{% for item in sentry_allowed_hosts %}'{{item}}'{% if not loop.last %},{% endif %}{% endfor %}]
+ALLOWED_HOSTS = [{% for item in sentry_allowed_hosts | union([sentry_domain]) %}'{{item}}'{% if not loop.last %},{% endif %}{% endfor %}]
 {% endif %}
 
 #################
