@@ -28,6 +28,7 @@ sentry_domain: sentry.dev
 sentry_registration: False
 sentry_social_auth_create_users: False
 sentry_protocol: http
+sentry_host: 0.0.0.0
 sentry_port: 9000
 sentry_db: sentry
 sentry_db_user: sentry
